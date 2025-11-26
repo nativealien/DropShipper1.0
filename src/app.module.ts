@@ -9,6 +9,7 @@ import { ProductsModule } from './products/products.module';
 import { User } from './users/users.entity';
 import { Product } from './products/products.entity';
 import { CjModule } from './integrations/cj/cj.module';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { CjModule } from './integrations/cj/cj.module';
     AuthModule,
     ProductsModule,
     CjModule,
+    CommonModule,
   ],
   controllers: [AppController],
   providers: [AppService],

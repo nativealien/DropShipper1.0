@@ -1,61 +1,57 @@
-import { HttpException, Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
-import { AxiosError } from 'axios';
+import { HttpClientService } from '../../common/http/http-service.service';
 
 @Injectable()
 export class CjAuthService {
   private readonly apiKey: string;
-  private readonly url: string;
+  private readonly accessToken: string;
+  private readonly refreshToken: string;
+  private readonly baseUrl: string;
   private readonly endpoint = 'authentication/';
-  private readonly logger = new Logger(CjAuthService.name);
-  private async post<T>(path: string, payload: unknown): Promise<T> {
-    try {
-      const { data } = await firstValueFrom(this.http.post<T>(path, payload));
-      return data;
-    } catch (error) {
-      const axiosError = error as AxiosError<{ message?: string; code?: number }>;
-      const status = axiosError.response?.status ?? 500;
-      const message =
-        axiosError.response?.data?.message ??
-        axiosError.message ??
-        'CJ request failed';
-
-      this.logger.error(`POST ${path} failed (${status}): ${message}`);
-      throw new HttpException(message, status);
-    }
-  }
 
   constructor(
     private readonly configService: ConfigService,
-    private readonly http: HttpService
+    private readonly httpClient: HttpClientService,
   ) {
-    this.url = this.configService.get<string>('CJ_URL') ?? '';
+    this.baseUrl = this.configService.get<string>('CJ_URL') ?? '';
     this.apiKey = this.configService.get<string>('CJ_API_KEY') ?? '';
-  }
-
-  async testCjAuth() {
-    console.log(this.url, this.apiKey);
-    return "Test CJ Auth";
+    this.accessToken = this.configService.get<string>('CJ_ACCESS_TOKEN') ?? '';
+    this.refreshToken = this.configService.get<string>('CJ_REFRESH_TOKEN') ?? '';
   }
 
   async getCjAuthToken() {
-    return this.post(`${this.endpoint}getAccessToken`, {
-      apiKey: this.apiKey,
-    });
+    return this.httpClient.post(
+      `${this.endpoint}getAccessToken`,      // just the “ending”
+      { apiKey: this.apiKey },
+      { baseUrl: this.baseUrl },            // which API
+    );
   }
 
   async refreshCjAuthToken() {
-    return this.post(`${this.endpoint}refreshAccessToken`, {
-      apiKey: this.apiKey,
-    });
+    return this.httpClient.post(
+      `${this.endpoint}refreshAccessToken`,
+      { apiKey: this.apiKey },
+      { baseUrl: this.baseUrl },
+    );
   }
 
   async logoutCjAuthToken() {
-    return this.post(`${this.endpoint}logout`, {
-      apiKey: this.apiKey,
-    });
+    return this.httpClient.post(
+      `${this.endpoint}logout`,
+      { apiKey: this.apiKey },
+      { baseUrl: this.baseUrl },
+    );
   }
 
+  async getAccountSettings() {
+    return this.httpClient.get('/setting/get', {
+      baseUrl: this.baseUrl,
+      headers: {
+        "CJ-Access-Token": this.accessToken,
+      },
+    });
+  }
 }
+
+
