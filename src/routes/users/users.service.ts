@@ -10,6 +10,10 @@ export class UsersService {
     private readonly repo: Repository<User>,
   ) {}
 
+  findById(id: number) {
+    return this.repo.findOne({ where: { id } });
+  }
+
   findAll() {
     return this.repo.find();
   }
