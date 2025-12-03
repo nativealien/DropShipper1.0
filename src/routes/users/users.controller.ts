@@ -4,6 +4,7 @@ import { UsersService } from './users.service';
 import { AuthService } from '../../auth/auth.service';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { Roles } from '../../auth/roles.decorator';
+import { RolesGuard } from '../../auth/roles.guard';
 import { Role } from './role.enum';
 
 @Controller('users')
@@ -16,7 +17,7 @@ export class UsersController {
   @Post('register')
   register(
     @Body()
-    body: { email: string; name?: string; password: string },
+    body: { email: string; name?: string; password: string; role?: Role },
   ) {
     return this.authService.register(body);
   }
@@ -27,12 +28,20 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Post('logout')
+  logout() {
+    // With stateless JWT, logout is handled client-side by deleting the token.
+    // This endpoint exists mainly so clients have a URL to call.
+    return { success: true };
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get('me')
   me(@Req() req) {
     return this.usersService.findById(req.user.userId);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @Get()
   findAll() {

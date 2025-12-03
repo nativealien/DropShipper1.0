@@ -1,14 +1,46 @@
-## Create User
-POST http://localhost:3000/users
+@baseUrl = http://localhost:3000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImVtYWlsIjoiYWRtaW5AdGVzdC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjQ3NTI0MjgsImV4cCI6MTc2NDc1NjAyOH0.esnLQ6a1wvYbKnxxNpkB_Naw9Ah9LRGtfyN4FFy9Me0
+###
+
+## Register User
+POST {{baseUrl}}/users/register
 Content-Type: application/json
 
 {
-    "email": "test@test.com",
-    "name": "Test User"
+    "email": "admin@test.com",
+    "name": "admin",
+    "password": "password123",
+    "role": "admin"
 }
 
 ###
 
-## Get All Users
-GET http://localhost:3000/users
+## Login
+POST {{baseUrl}}/users/login
+Content-Type: application/json
 
+{
+    "email": "test@test.com",
+    "password": "password123"
+}
+
+###
+
+## Logout (stateless - just a convenience endpoint)
+POST {{baseUrl}}/users/logout
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+###
+
+## Get Current User (Protected - requires JWT)
+GET {{baseUrl}}/users/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+###
+
+## Get All Users (Protected - requires JWT + ADMIN role)
+GET {{baseUrl}}/users
+Authorization: Bearer {{token}}
+Content-Type: application/json

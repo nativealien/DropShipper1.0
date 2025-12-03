@@ -1,0 +1,132 @@
+@baseUrl = http://localhost:3000
+
+###
+
+## Create Product
+POST {{baseUrl}}/products
+Content-Type: application/json
+
+{
+  "provider": "test-provider",
+  "pid": "P-123",
+  "sku": "SKU-123",
+  "name": "Test Product",
+  "description": "A test product",
+  "imageUrl": "https://example.com/image.jpg",
+  "imageSet": {
+    "thumb": "https://example.com/thumb.jpg",
+    "large": "https://example.com/large.jpg"
+  },
+  "storefrontIds": [1],
+  "variants": [
+    {
+      "vid": "V-1",
+      "sku": "SKU-1",
+      "name": "Variant 1",
+      "key": "red-large",
+      "standard": "EU",
+      "length": 10,
+      "width": 5,
+      "height": 2,
+      "weight": 0.3,
+      "image_url": "https://example.com/variant1.jpg",
+      "buy_price": 5.0,
+      "suggested_price": 10.0,
+      "margin_percent": 50,
+      "sell_price": 9.99
+    },
+        {
+      "vid": "V-2",
+      "sku": "SKU-2",
+      "name": "Variant 2",
+      "key": "blue-small",
+      "standard": "US",
+      "length": 10,
+      "width": 5,
+      "height": 2,
+      "weight": 0.3,
+      "image_url": "https://example.com/variant1.jpg",
+      "buy_price": 5.0,
+      "suggested_price": 10.0,
+      "margin_percent": 50,
+      "sell_price": 9.99
+    }
+  ]
+}
+
+###
+
+## Get All Products
+GET {{baseUrl}}/products
+Content-Type: application/json
+
+###
+
+## Get Product by ID
+GET {{baseUrl}}/products/4
+Content-Type: application/json
+
+###
+
+## Update Product
+PATCH {{baseUrl}}/products/1
+Content-Type: application/json
+
+{
+  "name": "Updated Product Name",
+  "description": "Updated description"
+}
+
+###
+
+## Delete Product
+DELETE {{baseUrl}}/products/1
+Content-Type: application/json
+
+###
+
+## List Variants for Product
+GET {{baseUrl}}/products/1/variants
+Content-Type: application/json
+
+###
+
+## Create Variant for Product
+POST {{baseUrl}}/products/1/variants
+Content-Type: application/json
+
+{
+  "vid": "V-2",
+  "sku": "SKU-1",
+  "name": "Variant 1",
+  "key": "red-large",
+  "standard": "EU",
+  "length": 10,
+  "width": 5,
+  "height": 2,
+  "weight": 0.3,
+  "image_url": "https://example.com/variant1.jpg",
+  "buy_price": 5.0,
+  "suggested_price": 10.0,
+  "margin_percent": 50,
+  "sell_price": 9.99
+}
+
+###
+
+## Update Variant
+PATCH {{baseUrl}}/products/4/variants/5
+Content-Type: application/json
+
+{
+  "name": "Updated Variant 1",
+  "sell_price": 11.99
+}
+
+###
+
+## Delete Variant
+DELETE {{baseUrl}}/products/1/variants/1
+Content-Type: application/json
+
+

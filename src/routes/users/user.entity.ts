@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Role } from './role.enum';
+import { Storefront } from '../storefronts/storefront.entity';
 
 @Entity('users')
 export class User {
@@ -27,4 +28,7 @@ export class User {
     default: () => 'CURRENT_TIMESTAMP',
   })
   createdAt: Date;
+
+  @OneToMany(() => Storefront, (storefront) => storefront.owner)
+  storefronts: Storefront[];
 }
