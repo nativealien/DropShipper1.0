@@ -76,7 +76,19 @@ export class StorefrontsService {
 
   async getProducts(id: number) {
     const storefront = await this.findOne(id);
-    return storefront.products ?? [];
+    const productIds = (storefront.products ?? []).map((p) => p.id);
+    
+    if (productIds.length === 0) {
+      return [];
+    }
+
+    // Fetch products with their variants
+    const products = await this.productRepo.find({
+      where: { id: In(productIds) },
+      relations: ['variants'],
+    });
+
+    return products;
   }
 
   async addProducts(id: number, ownerId: number, productIds: number[]) {

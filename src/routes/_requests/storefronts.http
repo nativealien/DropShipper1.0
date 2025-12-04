@@ -1,5 +1,5 @@
 @baseUrl = http://localhost:3000
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImVtYWlsIjoiYWRtaW5AdGVzdC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjQ3NTI0MjgsImV4cCI6MTc2NDc1NjAyOH0.esnLQ6a1wvYbKnxxNpkB_Naw9Ah9LRGtfyN4FFy9Me0
+@token = token
 ###
 
 ###
@@ -24,7 +24,7 @@ Content-Type: application/json
 ###
 
 ## Get Storefront by ID
-GET {{baseUrl}}/storefronts/5
+GET {{baseUrl}}/storefronts/6
 Content-Type: application/json
 
 ###
@@ -56,7 +56,7 @@ Content-Type: application/json
 ###
 
 ## Get Storefront Products
-GET {{baseUrl}}/storefronts/5/products
+GET {{baseUrl}}/storefronts/6/products
 Content-Type: application/json
 
 ###

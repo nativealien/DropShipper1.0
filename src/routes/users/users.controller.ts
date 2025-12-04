@@ -6,6 +6,8 @@ import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { Roles } from '../../auth/roles.decorator';
 import { RolesGuard } from '../../auth/roles.guard';
 import { Role } from './role.enum';
+import { RegisterUserDto } from './dto/register-user.dto';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('users')
 export class UsersController {
@@ -17,13 +19,13 @@ export class UsersController {
   @Post('register')
   register(
     @Body()
-    body: { email: string; name?: string; password: string; role?: Role },
+    body: RegisterUserDto,
   ) {
     return this.authService.register(body);
   }
 
   @Post('login')
-  login(@Body() body: { email: string; password: string }) {
+  login(@Body() body: LoginDto) {
     return this.authService.login(body.email, body.password);
   }
 

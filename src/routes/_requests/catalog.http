@@ -1,0 +1,35 @@
+@baseUrl = http://localhost:3000
+
+###
+
+## List Providers
+GET {{baseUrl}}/catalog/providers
+Content-Type: application/json
+
+###
+
+## List Categories for Provider
+## provider must be one of the values from DropshippingProvider enum, e.g. 'CJ'
+GET {{baseUrl}}/catalog/cj/categories
+Content-Type: application/json
+
+###
+
+## List Products for Provider (simple search)
+GET {{baseUrl}}/catalog/cj/products?keyWord=shoes&page=1&size=10
+Content-Type: application/json
+
+###
+
+## List Products for Provider (advanced example)
+GET {{baseUrl}}/catalog/cj/products?keyWord=t-shirt&countryCode=US&startSellPrice=5&endSellPrice=20&productFlag=0&sort=desc&orderBy=0&page=1&size=20
+Content-Type: application/json
+
+###
+
+## Get Single Product by External ID
+## externalId is the provider's product ID (e.g. CJ product ID)
+GET {{baseUrl}}/catalog/cj/products/EXTERNAL_PRODUCT_ID_HERE
+Content-Type: application/json
+
+

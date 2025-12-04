@@ -8,41 +8,17 @@ import {
   Post,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
+import { CreateVariantDto } from './dto/create-variant.dto';
+import { UpdateVariantDto } from './dto/update-variant.dto';
 
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
-  createProduct(
-    @Body()
-    body: {
-      provider: string;
-      pid?: string;
-      sku?: string;
-      name: string;
-      description?: string;
-      imageUrl?: string;
-      imageSet?: any;
-      variants?: {
-        vid?: string;
-        sku?: string;
-        name?: string;
-        key?: string;
-        standard?: string;
-        length?: number;
-        width?: number;
-        height?: number;
-        weight?: number;
-        image_url?: string;
-        buy_price?: number;
-        suggested_price?: number;
-        margin_percent?: number;
-        sell_price?: number;
-      }[];
-      storefrontIds?: number[];
-    },
-  ) {
+  createProduct(@Body() body: CreateProductDto) {
     return this.productsService.createProduct(body);
   }
 
@@ -57,19 +33,7 @@ export class ProductsController {
   }
 
   @Patch(':id')
-  updateProduct(
-    @Param('id') id: string,
-    @Body()
-    body: {
-      provider?: string;
-      pid?: string;
-      sku?: string;
-      name?: string;
-      description?: string;
-      imageUrl?: string;
-      imageSet?: any;
-    },
-  ) {
+  updateProduct(@Param('id') id: string, @Body() body: UpdateProductDto) {
     return this.productsService.updateProduct(Number(id), body);
   }
 
@@ -88,23 +52,7 @@ export class ProductsController {
   @Post(':productId/variants')
   createVariant(
     @Param('productId') productId: string,
-    @Body()
-    body: {
-      vid?: string;
-      sku?: string;
-      name?: string;
-      key?: string;
-      standard?: string;
-      length?: number;
-      width?: number;
-      height?: number;
-      weight?: number;
-      image_url?: string;
-      buy_price?: number;
-      suggested_price?: number;
-      margin_percent?: number;
-      sell_price?: number;
-    },
+    @Body() body: CreateVariantDto,
   ) {
     return this.productsService.createVariant(Number(productId), body);
   }
@@ -113,23 +61,7 @@ export class ProductsController {
   updateVariant(
     @Param('productId') productId: string,
     @Param('variantId') variantId: string,
-    @Body()
-    body: {
-      vid?: string;
-      sku?: string;
-      name?: string;
-      key?: string;
-      standard?: string;
-      length?: number;
-      width?: number;
-      height?: number;
-      weight?: number;
-      image_url?: string;
-      buy_price?: number;
-      suggested_price?: number;
-      margin_percent?: number;
-      sell_price?: number;
-    },
+    @Body() body: UpdateVariantDto,
   ) {
     return this.productsService.updateVariant(
       Number(productId),

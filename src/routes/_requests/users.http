@@ -1,5 +1,5 @@
 @baseUrl = http://localhost:3000
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImVtYWlsIjoiYWRtaW5AdGVzdC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjQ3NTI0MjgsImV4cCI6MTc2NDc1NjAyOH0.esnLQ6a1wvYbKnxxNpkB_Naw9Ah9LRGtfyN4FFy9Me0
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImVtYWlsIjoiYWRtaW5AdGVzdC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjQ3NTc0NTQsImV4cCI6MTc2NDc2MTA1NH0.saXs82BXc8tOHyAbcwhiUoL2-wRYchgEeCWlqnvaNSQ
 ###
 
 ## Register User
@@ -20,7 +20,7 @@ POST {{baseUrl}}/users/login
 Content-Type: application/json
 
 {
-    "email": "test@test.com",
+    "email": "admin@test.com",
     "password": "password123"
 }
 

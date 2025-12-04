@@ -14,7 +14,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async register(data: { email: string; name?: string; password: string }) {
+  async register(data: { email: string; name?: string; password: string; role?: Role }) {
     const existing = await this.usersRepo.findOne({ where: { email: data.email } });
     if (existing) {
       throw new UnauthorizedException('Email already in use');
@@ -26,7 +26,7 @@ export class AuthService {
       email: data.email,
       name: data.name,
       passwordHash,
-      role: Role.USER,
+      role: data.role ?? Role.USER,
     });
 
     await this.usersRepo.save(user);

@@ -4,39 +4,10 @@ import { In, Repository } from 'typeorm';
 import { Product } from './product.entity';
 import { Variant } from './variant.entity';
 import { Storefront } from '../storefronts/storefront.entity';
-
-interface CreateVariantDto {
-  vid?: string;
-  sku?: string;
-  name?: string;
-  key?: string;
-  standard?: string;
-  length?: number;
-  width?: number;
-  height?: number;
-  weight?: number;
-  image_url?: string;
-  buy_price?: number;
-  suggested_price?: number;
-  margin_percent?: number;
-  sell_price?: number;
-}
-
-interface UpdateVariantDto extends Partial<CreateVariantDto> {}
-
-interface CreateProductDto {
-  provider: string;
-  pid?: string;
-  sku?: string;
-  name: string;
-  description?: string;
-  imageUrl?: string;
-  imageSet?: any;
-  variants?: CreateVariantDto[];
-  storefrontIds?: number[];
-}
-
-interface UpdateProductDto extends Partial<Omit<CreateProductDto, 'variants'>> {}
+import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
+import { CreateVariantDto } from './dto/create-variant.dto';
+import { UpdateVariantDto } from './dto/update-variant.dto';
 
 @Injectable()
 export class ProductsService {
@@ -121,8 +92,11 @@ export class ProductsService {
     data: UpdateVariantDto,
   ) {
     const where: any[] = [];
-    if (data.vid) where.push({ vid: data.vid });
-    if (data.sku) where.push({ sku: data.sku });
+    const maybeVid = (data as any).vid as string | undefined;
+    const maybeSku = (data as any).sku as string | undefined;
+
+    if (maybeVid) where.push({ vid: maybeVid });
+    if (maybeSku) where.push({ sku: maybeSku });
     if (where.length === 0) return;
 
     const existing = await this.variantRepo.find({ where });
@@ -194,6 +168,13 @@ export class ProductsService {
 
   async removeProduct(id: number) {
     const product = await this.findProductById(id);
+    
+    // Explicitly delete all variants first (CASCADE should handle this, but being explicit)
+    if (product.variants && product.variants.length > 0) {
+      await this.variantRepo.remove(product.variants);
+    }
+    
+    // Then delete the product
     await this.productRepo.remove(product);
     return { success: true };
   }

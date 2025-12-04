@@ -14,6 +14,9 @@ import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { RolesGuard } from '../../auth/roles.guard';
 import { Roles } from '../../auth/roles.decorator';
 import { Role } from '../users/role.enum';
+import { CreateStorefrontDto } from './dto/create-storefront.dto';
+import { UpdateStorefrontDto } from './dto/update-storefront.dto';
+import { AddProductsDto } from './dto/add-products.dto';
 
 @Controller('storefronts')
 export class StorefrontsController {
@@ -23,7 +26,7 @@ export class StorefrontsController {
   @Post()
   create(
     @Req() req,
-    @Body() body: { title: string; description?: string },
+    @Body() body: CreateStorefrontDto,
   ) {
     return this.storefrontsService.create(req.user.userId, body);
   }
@@ -51,7 +54,7 @@ export class StorefrontsController {
   update(
     @Param('id') id: string,
     @Req() req,
-    @Body() body: { title?: string; description?: string },
+    @Body() body: UpdateStorefrontDto,
   ) {
     return this.storefrontsService.update(
       Number(id),
@@ -76,7 +79,7 @@ export class StorefrontsController {
   addProducts(
     @Param('id') id: string,
     @Req() req,
-    @Body() body: { productIds: number[] },
+    @Body() body: AddProductsDto,
   ) {
     return this.storefrontsService.addProducts(
       Number(id),
