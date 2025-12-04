@@ -1,11 +1,14 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Role } from './role.enum';
-import { Storefront } from '../storefronts/storefront.entity';
+import { Product } from '../products/product.entity';
 
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({ unique: true })
+  user_name: string;
 
   @Column({ unique: true })
   email: string;
@@ -29,6 +32,11 @@ export class User {
   })
   createdAt: Date;
 
-  @OneToMany(() => Storefront, (storefront) => storefront.owner)
-  storefronts: Storefront[];
+  @UpdateDateColumn({
+    type: 'timestamptz',
+  })
+  updatedAt: Date;
+
+  @ManyToMany(() => Product, (product) => product.owners)
+  products: Product[];
 }

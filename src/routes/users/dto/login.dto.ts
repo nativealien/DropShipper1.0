@@ -1,8 +1,9 @@
-import { IsEmail, IsString, MinLength } from 'class-validator';
+import { IsString, MinLength, Matches } from 'class-validator';
 
 export class LoginDto {
-  @IsEmail()
-  email: string;
+  @IsString()
+  @Matches(/^[^\s]+$/, { message: 'user_name must not contain spaces' })
+  user_name: string;
 
   @IsString()
   @MinLength(6)

@@ -1,9 +1,9 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Product } from './product.entity';
 import { Variant } from './variant.entity';
-import { Storefront } from '../storefronts/storefront.entity';
+import { User } from '../users/user.entity';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { CreateVariantDto } from './dto/create-variant.dto';
@@ -16,8 +16,8 @@ export class ProductsService {
     private readonly productRepo: Repository<Product>,
     @InjectRepository(Variant)
     private readonly variantRepo: Repository<Variant>,
-    @InjectRepository(Storefront)
-    private readonly storefrontRepo: Repository<Storefront>,
+    @InjectRepository(User)
+    private readonly userRepo: Repository<User>,
   ) {}
 
   private async ensureUniqueProductIdentifiers(
@@ -108,21 +108,16 @@ export class ProductsService {
     }
   }
 
-  async createProduct(data: CreateProductDto) {
-    const { variants, storefrontIds, ...productData } = data;
+  async createProduct(ownerId: number, data: CreateProductDto) {
+    const { variants, ...productData } = data;
 
     await this.ensureUniqueProductIdentifiers(productData.pid, productData.sku);
 
+    const owner = await this.userRepo.findOne({ where: { id: ownerId } });
+    if (!owner) throw new NotFoundException('User not found');
 
     const product = this.productRepo.create(productData);
-
-    if (storefrontIds && storefrontIds.length > 0) {
-      const storefronts = await this.storefrontRepo.find({
-        where: { id: In(storefrontIds) },
-      });
-      product.storefronts = storefronts;
-    }
-
+    product.owners = [owner];
     await this.productRepo.save(product);
 
     if (variants && variants.length > 0) {
@@ -142,20 +137,41 @@ export class ProductsService {
   }
 
   findAllProducts() {
-    return this.productRepo.find({ relations: ['variants'] });
+    return this.productRepo.find({ 
+      relations: ['variants', 'owners'],
+    });
+  }
+
+  findByOwner(ownerId: number) {
+    return this.productRepo
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.variants', 'variants')
+      .leftJoinAndSelect('product.owners', 'owners')
+      .innerJoin('product.owners', 'owner', 'owner.id = :ownerId', { ownerId })
+      .getMany();
   }
 
   async findProductById(id: number) {
     const product = await this.productRepo.findOne({
       where: { id },
-      relations: ['variants'],
+      relations: ['variants', 'owners'],
     });
     if (!product) throw new NotFoundException('Product not found');
     return product;
   }
 
-  async updateProduct(id: number, data: UpdateProductDto) {
+  private checkOwnership(product: Product, userId: number): boolean {
+    if (!product.owners || product.owners.length === 0) return false;
+    return product.owners.some((owner) => owner.id === userId);
+  }
+
+  async updateProduct(id: number, ownerId: number, data: UpdateProductDto) {
     const product = await this.findProductById(id);
+
+    // Check ownership
+    if (!this.checkOwnership(product, ownerId)) {
+      throw new ForbiddenException('You do not own this product');
+    }
 
     // If pid or sku are changing, enforce uniqueness
     if (data.pid || data.sku) {
@@ -166,8 +182,13 @@ export class ProductsService {
     return this.productRepo.save(product);
   }
 
-  async removeProduct(id: number) {
+  async removeProduct(id: number, ownerId: number) {
     const product = await this.findProductById(id);
+
+    // Check ownership
+    if (!this.checkOwnership(product, ownerId)) {
+      throw new ForbiddenException('You do not own this product');
+    }
     
     // Explicitly delete all variants first (CASCADE should handle this, but being explicit)
     if (product.variants && product.variants.length > 0) {
@@ -184,8 +205,13 @@ export class ProductsService {
     return product.variants ?? [];
   }
 
-  async createVariant(productId: number, data: CreateVariantDto) {
+  async createVariant(productId: number, ownerId: number, data: CreateVariantDto) {
     const product = await this.findProductById(productId);
+
+    // Check ownership
+    if (!this.checkOwnership(product, ownerId)) {
+      throw new ForbiddenException('You do not own this product');
+    }
 
     await this.ensureUniqueVariantIdentifiersForCreate([data]);
 
@@ -197,8 +223,13 @@ export class ProductsService {
     return this.variantRepo.save(variant);
   }
 
-  async updateVariant(productId: number, variantId: number, data: UpdateVariantDto) {
-    await this.findProductById(productId);
+  async updateVariant(productId: number, variantId: number, ownerId: number, data: UpdateVariantDto) {
+    const product = await this.findProductById(productId);
+
+    // Check ownership
+    if (!this.checkOwnership(product, ownerId)) {
+      throw new ForbiddenException('You do not own this product');
+    }
 
     const variant = await this.variantRepo.findOne({
       where: { id: variantId },
@@ -214,8 +245,13 @@ export class ProductsService {
     return this.variantRepo.save(variant);
   }
 
-  async removeVariant(productId: number, variantId: number) {
-    await this.findProductById(productId);
+  async removeVariant(productId: number, variantId: number, ownerId: number) {
+    const product = await this.findProductById(productId);
+
+    // Check ownership
+    if (!this.checkOwnership(product, ownerId)) {
+      throw new ForbiddenException('You do not own this product');
+    }
 
     const variant = await this.variantRepo.findOne({
       where: { id: variantId },
@@ -227,5 +263,49 @@ export class ProductsService {
 
     await this.variantRepo.remove(variant);
     return { success: true };
+  }
+
+  async addOwner(productId: number, userId: number, newOwnerId: number) {
+    const product = await this.findProductById(productId);
+
+    // Check that the requester owns the product
+    if (!this.checkOwnership(product, userId)) {
+      throw new ForbiddenException('You do not own this product');
+    }
+
+    // Check if user is already an owner
+    if (this.checkOwnership(product, newOwnerId)) {
+      throw new BadRequestException('User is already an owner of this product');
+    }
+
+    const newOwner = await this.userRepo.findOne({ where: { id: newOwnerId } });
+    if (!newOwner) throw new NotFoundException('User not found');
+
+    product.owners = [...(product.owners || []), newOwner];
+    await this.productRepo.save(product);
+    return this.findProductById(productId);
+  }
+
+  async removeOwner(productId: number, userId: number, ownerIdToRemove: number) {
+    const product = await this.findProductById(productId);
+
+    // Check that the requester owns the product
+    if (!this.checkOwnership(product, userId)) {
+      throw new ForbiddenException('You do not own this product');
+    }
+
+    // Prevent removing the last owner
+    if (product.owners && product.owners.length <= 1) {
+      throw new BadRequestException('Cannot remove the last owner of a product');
+    }
+
+    // Check if the user to remove is actually an owner
+    if (!this.checkOwnership(product, ownerIdToRemove)) {
+      throw new BadRequestException('User is not an owner of this product');
+    }
+
+    product.owners = (product.owners || []).filter((owner) => owner.id !== ownerIdToRemove);
+    await this.productRepo.save(product);
+    return this.findProductById(productId);
   }
 }

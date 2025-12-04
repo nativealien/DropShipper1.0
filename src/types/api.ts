@@ -40,7 +40,6 @@ export interface User {
   name?: string;
   role: Role;
   createdAt: Date;
-  storefronts?: Storefront[];
 }
 
 export interface AuthResponse {
@@ -54,38 +53,6 @@ export interface AuthResponse {
 }
 
 export interface LogoutResponse {
-  success: boolean;
-}
-
-// ============================================================================
-// STOREFRONTS API
-// ============================================================================
-
-// Request Types
-export interface CreateStorefrontRequest {
-  title: string;
-  description?: string;
-}
-
-export interface UpdateStorefrontRequest {
-  title?: string;
-  description?: string;
-}
-
-export interface AddProductsRequest {
-  productIds: number[];
-}
-
-// Response Types
-export interface Storefront {
-  id: number;
-  title: string;
-  description?: string;
-  owner?: User;
-  products?: Product[];
-}
-
-export interface RemoveStorefrontResponse {
   success: boolean;
 }
 
@@ -120,7 +87,6 @@ export interface CreateProductRequest {
   imageUrl?: string;
   imageSet?: any;
   variants?: CreateVariantRequest[];
-  storefrontIds?: number[];
 }
 
 export interface UpdateProductRequest {
@@ -180,7 +146,6 @@ export interface Product {
   description?: string;
   imageUrl?: string;
   imageSet?: any;
-  storefronts?: Storefront[];
   variants?: Variant[];
 }
 
@@ -284,18 +249,6 @@ export interface ApiErrorResponse {
  * POST   /users/logout             -> (no body) -> LogoutResponse
  * GET    /users/me                 -> (no body) -> User
  * GET    /users                    -> (no body) -> User[]
- * 
- * STOREFRONTS ENDPOINTS:
- * 
- * POST   /storefronts              -> CreateStorefrontRequest -> Storefront
- * GET    /storefronts               -> (no body) -> Storefront[]
- * GET    /storefronts/me           -> (no body) -> Storefront[]
- * GET    /storefronts/:id          -> (no body) -> Storefront
- * PATCH  /storefronts/:id          -> UpdateStorefrontRequest -> Storefront
- * DELETE /storefronts/:id          -> (no body) -> RemoveStorefrontResponse
- * GET    /storefronts/:id/products -> (no body) -> Product[]
- * POST   /storefronts/:id/products -> AddProductsRequest -> Storefront
- * DELETE /storefronts/:id/products/:productId -> (no body) -> Storefront
  * 
  * PRODUCTS ENDPOINTS:
  * 

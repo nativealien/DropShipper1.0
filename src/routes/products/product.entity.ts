@@ -1,13 +1,14 @@
 import { 
     Entity, 
     Column, 
-    ManyToMany, 
     PrimaryGeneratedColumn,
-    OneToMany 
+    OneToMany,
+    ManyToMany,
+    JoinTable
 } from "typeorm";
 
-import { Storefront } from "../storefronts/storefront.entity";
 import { Variant } from "./variant.entity";
+import { User } from "../users/user.entity";
 
 
 @Entity('products')
@@ -36,8 +37,13 @@ export class Product {
   @Column({ type: 'jsonb', nullable: true })
   imageSet?: any;
 
-  @ManyToMany(() => Storefront, (s) => s.products)
-  storefronts: Storefront[];
+  @ManyToMany(() => User, (user) => user.products)
+  @JoinTable({
+    name: 'product_owners',
+    joinColumn: { name: 'product_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
+  })
+  owners: User[];
 
   @OneToMany(() => Variant, (v) => v.product)
   variants: Variant[];

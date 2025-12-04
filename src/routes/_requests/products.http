@@ -1,9 +1,11 @@
 @baseUrl = http://localhost:3000
+@token = your-jwt-token-here
 
 ###
 
-## Create Product
+## Create Product (Protected - requires JWT)
 POST {{baseUrl}}/products
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -17,7 +19,6 @@ Content-Type: application/json
     "thumb": "https://example.com/thumb.jpg",
     "large": "https://example.com/large.jpg"
   },
-  "storefrontIds": [1],
   "variants": [
     {
       "vid": "V-1",
@@ -62,14 +63,22 @@ Content-Type: application/json
 
 ###
 
+## Get My Products (Protected - requires JWT)
+GET {{baseUrl}}/products/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+###
+
 ## Get Product by ID
 GET {{baseUrl}}/products/4
 Content-Type: application/json
 
 ###
 
-## Update Product
+## Update Product (Protected - requires JWT + ownership)
 PATCH {{baseUrl}}/products/1
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -79,8 +88,9 @@ Content-Type: application/json
 
 ###
 
-## Delete Product
+## Delete Product (Protected - requires JWT + ownership)
 DELETE {{baseUrl}}/products/1
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 ###
@@ -91,8 +101,9 @@ Content-Type: application/json
 
 ###
 
-## Create Variant for Product
+## Create Variant for Product (Protected - requires JWT + ownership)
 POST {{baseUrl}}/products/1/variants
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -114,8 +125,9 @@ Content-Type: application/json
 
 ###
 
-## Update Variant
+## Update Variant (Protected - requires JWT + ownership)
 PATCH {{baseUrl}}/products/4/variants/5
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -125,8 +137,27 @@ Content-Type: application/json
 
 ###
 
-## Delete Variant
+## Delete Variant (Protected - requires JWT + ownership)
 DELETE {{baseUrl}}/products/1/variants/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+###
+
+## Add Owner to Product (Protected - requires JWT + ownership)
+POST {{baseUrl}}/products/1/owners
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "userId": 2
+}
+
+###
+
+## Remove Owner from Product (Protected - requires JWT + ownership)
+DELETE {{baseUrl}}/products/1/owners/2
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 

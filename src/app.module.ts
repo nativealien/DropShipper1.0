@@ -5,9 +5,7 @@ import { User } from './routes/users/user.entity';
 import { UsersModule } from './routes/users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { Product } from './routes/products/product.entity';
-import { Storefront } from './routes/storefronts/storefront.entity';
 import { Variant } from './routes/products/variant.entity';
-import { StorefrontsModule } from './routes/storefronts/storefronts.module';
 import { ProductsModule } from './routes/products/products.module';
 import { CatalogModule } from './routes/catalog/catalog.module';
 
@@ -23,13 +21,12 @@ import { CatalogModule } from './routes/catalog/catalog.module';
       username: 'devuser',
       password: 'devpass',
       database: 'devdb',
-      entities: [User, Storefront, Product, Variant],
+      entities: [User, Product, Variant],
       synchronize: true, // dev only!
       logging: true,     // optional but nice in dev
     }),
     UsersModule,
     AuthModule,
-    StorefrontsModule,
     ProductsModule,
     CatalogModule,
   ],

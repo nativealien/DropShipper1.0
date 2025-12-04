@@ -1,5 +1,5 @@
 @baseUrl = http://localhost:3000
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImVtYWlsIjoiYWRtaW5AdGVzdC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjQ3NTc0NTQsImV4cCI6MTc2NDc2MTA1NH0.saXs82BXc8tOHyAbcwhiUoL2-wRYchgEeCWlqnvaNSQ
+@token = your-jwt-token-here
 ###
 
 ## Register User
@@ -7,21 +7,22 @@ POST {{baseUrl}}/users/register
 Content-Type: application/json
 
 {
-    "email": "admin@test.com",
-    "name": "admin",
+    "user_name": "admin",
+    "email": "swedefx@gmail.com",
+    "name": "Admin User",
     "password": "password123",
     "role": "admin"
 }
 
 ###
 
-## Login
+## Login (using user_name)
 POST {{baseUrl}}/users/login
 Content-Type: application/json
 
 {
-    "email": "admin@test.com",
-    "password": "password123"
+    "user_name": "admin",
+    "password": "newpass"
 }
 
 ###
@@ -44,3 +45,25 @@ Content-Type: application/json
 GET {{baseUrl}}/users
 Authorization: Bearer {{token}}
 Content-Type: application/json
+
+###
+
+## Request Password Reset
+POST {{baseUrl}}/users/password-reset/request
+Content-Type: application/json
+
+{
+    "email": "swedefx@gmail.com"
+}
+
+###
+
+## Reset Password
+POST {{baseUrl}}/users/password-reset/reset
+Content-Type: application/json
+
+{
+    "email": "swedefx@gmail.com",
+    "verification_code": "332361",
+    "password": "newpass"
+}

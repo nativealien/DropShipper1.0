@@ -38,12 +38,6 @@ export class CreateProductDto {
   @ValidateNested({ each: true })
   @Type(() => CreateVariantDto)
   variants?: CreateVariantDto[];
-
-  @IsOptional()
-  @IsArray()
-  @Type(() => Number)
-  @IsInt({ each: true })
-  storefrontIds?: number[];
 }
 
 

@@ -8,6 +8,8 @@ import { RolesGuard } from '../../auth/roles.guard';
 import { Role } from './role.enum';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginDto } from './dto/login.dto';
+import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Controller('users')
 export class UsersController {
@@ -26,7 +28,17 @@ export class UsersController {
 
   @Post('login')
   login(@Body() body: LoginDto) {
-    return this.authService.login(body.email, body.password);
+    return this.authService.login(body.user_name, body.password);
+  }
+
+  @Post('password-reset/request')
+  requestPasswordReset(@Body() body: RequestPasswordResetDto) {
+    return this.authService.requestPasswordReset(body.email);
+  }
+
+  @Post('password-reset/reset')
+  resetPassword(@Body() body: ResetPasswordDto) {
+    return this.authService.resetPassword(body.email, body.verification_code, body.password);
   }
 
   @UseGuards(JwtAuthGuard)
